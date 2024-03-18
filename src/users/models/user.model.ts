@@ -5,6 +5,7 @@ import {
   PrimaryKey,
   DataType,
   Default,
+  NotEmpty,
 } from 'sequelize-typescript';
 
 @Table
@@ -14,14 +15,17 @@ export class User extends Model {
   @Column(DataType.UUID)
   id: string;
 
+  @NotEmpty
   @Column
   name: string;
 
+  @NotEmpty
   @Column({
     unique: true,
   })
   email: string;
 
+  @NotEmpty
   @Column
   password: string;
 }

@@ -1,5 +1,5 @@
 # Use root/example as user/password credentials
-version: '3.8'
+version: '3.3'
 
 services:
   api_service:
@@ -20,9 +20,7 @@ services:
         condition: service_healthy
 
   test_db:
-    image: mysql:8.0
-    cap_add:
-      - SYS_NICE
+    image: mysql
     restart: always
     ports:
       - '3306:3306'
@@ -30,10 +28,8 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=mydb
       - MYSQL_ROOT_PASSWORD=testpassword
-    command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - db:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - my-db:/var/lib/mysql
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 10s
@@ -46,5 +42,5 @@ services:
     depends_on:
       - test_db
 volumes:
-  db:
+  my-db:
     driver: local

@@ -1,6 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ValidationError } from 'sequelize';
+import * as bcrypt from 'bcrypt';
 import { User } from './models/user.model';
 
 @Injectable()
@@ -10,13 +15,37 @@ export class UsersService {
     private userModel: typeof User,
   ) {}
 
-  getUser(id: string): string {
-    return 'USER:' + id;
+  findUser(email: string): Promise<User> {
+    return this.userModel.findOne({
+      where: {
+        email,
+      },
+    });
+  }
+
+  async findUserByID(userID: string): Promise<User> {
+    const user = await this.userModel.findOne({
+      attributes: {
+        exclude: ['password'],
+      },
+      where: {
+        id: userID,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Not found such user');
+    }
+
+    return user;
   }
 
   async createUser(userData): Promise<string> {
+    const salt = 10;
     try {
-      const user = new User(userData);
+      const { password, ...payload } = userData;
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const user = new User({ ...payload, password: hashedPassword });
       const createdUser = await user.save();
       return JSON.stringify(createdUser || {});
     } catch (err) {
