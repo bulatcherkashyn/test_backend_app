@@ -13,7 +13,6 @@ export class AuthService {
 
   async login(userData: LoginRequestDTO): Promise<LoginResponseDTO> {
     const user = await this.usersService.findUser(userData.email);
-
     if (!user) {
       throw new HttpException(
         'Credentials are not valid',

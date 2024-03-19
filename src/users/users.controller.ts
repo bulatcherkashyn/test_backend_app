@@ -3,7 +3,9 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/user.dto';
 import { User } from './models/user.model';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller({
   version: '1',
   path: '',
@@ -19,8 +21,10 @@ export class UsersController {
   }
 
   @Post('/add-user')
-  async addUser(@Body() createUserDto: CreateUserDto): Promise<string> {
+  async addUser(@Body() createUserDto: CreateUserDto) {
     await this.userService.createUser(createUserDto);
-    return 'Successfully created user';
+    return {
+      message: 'User successfully created',
+    };
   }
 }

@@ -15,16 +15,22 @@ export class UsersService {
     private userModel: typeof User,
   ) {}
 
-  findUser(email: string): Promise<User> {
-    return this.userModel.findOne({
+  async findUser(email: string): Promise<User> {
+    const user = await this.userModel.findOne({
+      raw: true,
       where: {
         email,
       },
     });
+    if (!user) {
+      throw new NotFoundException('Not found such user');
+    }
+    return user;
   }
 
   async findUserByID(userID: string): Promise<User> {
     const user = await this.userModel.findOne({
+      raw: true,
       attributes: {
         exclude: ['password'],
       },
